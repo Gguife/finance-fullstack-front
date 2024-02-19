@@ -1,50 +1,108 @@
-'use client';
+'use client'
+
 import { useState } from 'react';
-import axios from "axios";
-import * as S from "./Style";
+import axios from 'axios';
+import * as S from './style';
+import { useRouter } from 'next/navigation';
 
-const RegisterForm = () =>{
-  const [name, setName] = useState();
-  const [email, setEmail] = useState();
-  const [password, setPassword] = useState();
+export const RegisterForm = () => {
+  const router = useRouter()
+  const [ email, setEmail ] = useState();
+  const [ password, setPassword ] = useState();
+  const [ name, setName ] = useState();
+  const [ showPassword, setShowPassword ] = useState(false);
 
-  const onChangeValue = (e) =>{
-    const {name, value} = e.target;
+  const [ notification, setNotification ] = useState({
+    notification: false,
+    message: '',
+    severity: ''
+  });
 
-    if( name === "name" ) setName(value);
-    if( name === "email" ) setEmail(value);
-    if( name === "password" ) setPassword(value);
-  
+  const onChangeValue = (e) => {
+    const { name, value } = e.target
+    if (name === 'email') setEmail(value)
+    if (name === 'password') setPassword(value)
+    if (name === 'name') setName(value)
   }
 
-  const onSubmit = async (e) =>{
-    e.preventDefault();
-    
-    try{
-      const response = await axios.post("http://localhost:8080/auth/register", {name, email, password})
-      localStorage.setItem("token", response.data.data.token);
-      console.log("response", response);
+  const onSumbmit = async (e) => {
+    e.preventDefault()
+    try {
+      const response = await axios.post('http://localhost:8080/auth/register', { email, password, name })
+      localStorage.setItem('token', response.data.data.token)
+      setNotification({
+        open: true,
+        message: `Usuário ${ email } cadastrado com sucesso!`,
+        severity: 'success'
+      })
+      router.push('/dashboard')
     }
-    catch(error){
-      console.log("error", error);
+    catch (error) {
+      setNotification({
+        open: true,
+        message: error.response.error,
+        severity: 'error'
+      })
     }
-    
   }
 
+  const handleClose = (_, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
 
-  return(
-    <S.FormRegister>
-      <form onSubmit={onSubmit}>
-        <h1>Register Page</h1>
+    setNotification({
+      notification: false,
+      message: '',
+      severity: ''
+    })
+  }
 
-        <S.TextField type='name' id="name" label="name" name='name' variant="outlined" onChange={onChangeValue} />
-        <S.TextField type='email' id="email" label="email" name='email' variant="outlined" onChange={onChangeValue} />
-        <S.TextField type='password' id="password" label="password" name='password' variant="outlined" onChange={onChangeValue} />
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
 
-        <S.Button variant="contained" type="submit">Cadastrar</S.Button>
-      </form>
-    </S.FormRegister>
+  const handleMouseDownPassword = (event) => {
+    event.preventDefault();
+  };
+
+  return (
+    <>
+    <S.Form onSubmit={ onSumbmit }>
+      <S.Typography variant='h1' color="primary" style={{ marginBottom: '64px' }}>YOURfinance.IO</S.Typography>
+      <S.Typography variant='h2' style={{ marginBottom: '64px' }}>Crie sua conta</S.Typography>
+      <S.TextField name="name" onChange={ onChangeValue } label="Nome" variant="outlined" color='primary' fullWidth />
+      <S.TextField name="email" onChange={ onChangeValue } label="E-mail" variant="outlined" color='primary' fullWidth />
+      <S.FormControl fullWidth variant="outlined">
+          <S.InputLabel htmlFor="outlined-adornment-password">Senha</S.InputLabel>
+          <S.OutlinedInput
+            id="outlined-adornment-password"
+            name="password"
+            onChange={ onChangeValue }
+            type={showPassword ? 'text' : 'password'}
+            endAdornment={
+              <S.InputAdornment position="end">
+                <S.IconButton
+                  aria-label="toggle password visibility"
+                  onClick={ handleClickShowPassword }
+                  onMouseDown={ handleMouseDownPassword }
+                  edge="end"
+                >
+                  {showPassword ? <S.VisibilityOff /> : <S.Visibility />}
+                </S.IconButton>
+              </S.InputAdornment>
+            }
+            label="Senha"
+          />
+        </S.FormControl>
+      <S.Button variant="contained" color="primary" type="submit" fullWidth>Enviar</S.Button>
+      <div>Já possui uma conta? <S.Link href="/login">Faça login aqui.</S.Link></div>
+    </S.Form>
+    <S.Snackbar open={ notification.open } autoHideDuration={ 3000 } onClose={ handleClose }>
+      <S.Alert onClose={ handleClose } severity={ notification.severity } variant="filled" sx={{ width: '100%' }}>
+        { notification.message }
+      </S.Alert>
+    </S.Snackbar>
+    </>
   )
 }
 
-export default RegisterForm;
+export default RegisterForm
