@@ -31,17 +31,21 @@ export const GoalsUpdate = ({ metaId }) => {
             Authorization: `Bearer ${ token }`
           }
         })
-        setDescricao(response.data.data.descricao)
-        setValor(response.data.data.valor)
-        setDataMeta(response.data.data.data)
+        setDescricao(response.data.data.description)
+        setValor(response.data.data.value)
+        setDataMeta(response.data.data.date)
         setUserId(response.data.data.user_id)
       }
       catch (error) {
+        let errorMessage = "Ocorreu um erro desconhecido.";
+        if (error.response && error.response.error) {
+          errorMessage = error.response.error;
+        }
         setNotification({
           open: true,
-          message: error.response.data.message,
+          message: errorMessage,
           severity: 'error'
-        })
+        });
       }
     }
 
@@ -53,9 +57,9 @@ export const GoalsUpdate = ({ metaId }) => {
     try {
       const token = localStorage.getItem('token')
       await axios.put(`http://localhost:8080/goals/${ metaId }`, {
-        descricao,
-        valor,
-        data: dataMeta,
+        description: descricao,
+        value: valor,
+        date: dataMeta,
         user_id: userId
       }, {
         headers: {
@@ -70,11 +74,15 @@ export const GoalsUpdate = ({ metaId }) => {
       })
     }
     catch (error) {
+      let errorMessage = "Ocorreu um erro desconhecido.";
+      if (error.response && error.response.error) {
+        errorMessage = error.response.error;
+      }
       setNotification({
         open: true,
-        message: error.response.error,
+        message: errorMessage,
         severity: 'error'
-      })
+      });
     }
   }
 
