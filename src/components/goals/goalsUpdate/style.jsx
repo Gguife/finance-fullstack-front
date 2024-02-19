@@ -1,10 +1,17 @@
-import styled from "@emotion/styled";
+import styled from '@emotion/styled'
+import ButtonMUI from '@mui/material/Button';
+import TextFieldMUI from '@mui/material/TextField';
+import AlertMUI from '@mui/material/Alert';
+import SnackbarMUI from '@mui/material/Snackbar';
 
-import ButtonUI from "@mui/material/Button";
-import TextFieldUI from "@mui/material/TextField";
+export const Button = styled(ButtonMUI)``;
 
-export const FormCategory = styled.div``;
+export const TextField = styled(TextFieldMUI)``;
 
-export const TextField = styled(TextFieldUI)``;
+export const H1 = styled.h1``;
 
-export const Button = styled(ButtonUI)``;
+export const Form = styled.form``;
+
+export const Alert = styled(AlertMUI)``;
+
+export const Snackbar = styled(SnackbarMUI)``;
